@@ -1,6 +1,8 @@
 #include "handlers/disk_handler.hpp"
 #include "handlers/memory_handler.hpp"
 
+#include "components/file_system/file_tree.hpp"
+
 namespace fs {
     /**
      * @brief Loads and controls the main functions to be performed on the
@@ -13,10 +15,19 @@ namespace fs {
         FSKernel();
         ~FSKernel();
 
+        bool createDirectory();
+        bool createFile();
+        bool writeToFile();
+        bool openFile();
+        bool closeFile();
+        bool deleteFile();
+        bool deleteDirectory();
+
         private:
         struct FSMemoryHandlers {
             FSMemoryHandler *fsMemoryHandler;
             FSDiskHandler *fsDiskHandler;
+            FSFileTree *fsFileTree;
         };
     };
 }

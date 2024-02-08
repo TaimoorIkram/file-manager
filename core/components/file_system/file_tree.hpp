@@ -3,7 +3,7 @@
 namespace fs {
     /**
      * @brief A system module that deals with a virtual file tree
-     * (VST) data structure as the system file tree.
+     * (VFT) data structure as the system file tree.
      * 
      */
     class FSFileTree {
