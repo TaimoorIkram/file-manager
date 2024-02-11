@@ -3,7 +3,10 @@
 
 #include "components/file_system/file_tree.hpp"
 
+#include "exception.hpp"
+
 namespace fs {
+
     /**
      * @brief Loads and controls the main functions to be performed on the
      * system including the memory reads, writes, disk loads, stores and 
@@ -15,6 +18,9 @@ namespace fs {
         FSKernel();
         ~FSKernel();
 
+        bool startKernel();
+        bool stopKernel();
+
         bool createDirectory();
         bool createFile();
         bool writeToFile();
@@ -22,12 +28,18 @@ namespace fs {
         bool closeFile();
         bool deleteFile();
         bool deleteDirectory();
+        bool getPrograms();
+        bool installProgram();
+
 
         private:
-        struct FSMemoryHandlers {
+        struct FSHandlers {
             FSMemoryHandler *fsMemoryHandler;
             FSDiskHandler *fsDiskHandler;
             FSFileTree *fsFileTree;
         };
+
+        FSHandlers fsHandlers{};
+        FSFileTree *fsFileTree;
     };
 }

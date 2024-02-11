@@ -11,6 +11,9 @@ namespace fs {
         FSDiskHandler();
         ~FSDiskHandler();
 
+        bool loadDisk(std::string diskFilePath);
+        bool saveDisk(std::string diskFilePath);
+        bool resetDisk(std::string diskFilePath);
         bool writeToDisk();
         std::string readFromDisk();
 
