@@ -1,7 +1,7 @@
 #include <iostream>
 
 #define FS_DISK_BLOCK_SIZE 8
-#define FS_DISK_MAX_BLOCK_COUNT 2048
+#define FS_DISK_MAX_BLOCK_COUNT 1024
 
 namespace fs
 {
@@ -13,15 +13,6 @@ namespace fs
     class FSDisk
     {
     public:
-        FSDisk();
-        ~FSDisk();
-
-        bool writeToBlock(int id, std::string data);
-        std::string readFromBlock(int id);
-        bool isFull() { return globalBlockId < FS_DISK_MAX_BLOCK_COUNT; }
-
-    private:
-        int globalBlockId;
         /**
          * @brief Disk memory's virtual unit, represents a single
          * block of storage of a particular block size.
@@ -29,13 +20,31 @@ namespace fs
          */
         struct FSDiskMemoryDataNode
         {
-            int id;
-            std::string data;
-            FSDiskMemoryDataNode *next;
+            int id = 0;
+            std::string data = "........";
+            FSDiskMemoryDataNode *next = nullptr;
             int sizeRemaining = FS_DISK_BLOCK_SIZE;
-            int toRead;
+            int toRead = -1;
+            bool empty = true;
         };
 
+        FSDisk();
+        ~FSDisk();
+        
+
+        std::string writeToBlock(int id, std::string data);
+        std::string readFromBlock(int id);
+        FSDiskMemoryDataNode* addDiskMemoryDataNode(std::string data);
+        bool linkNodes(int fromId, int toId);
+        FSDiskMemoryDataNode* getHeadNode();
+        FSDiskMemoryDataNode* getNode(int id);
+        int getNodeCount();
+        FSDiskMemoryDataNode* getLinkedNodes(int id);
+        FSDiskMemoryDataNode* getNextEmptyDataNode();
+        bool isFull() { return globalBlockId < FS_DISK_MAX_BLOCK_COUNT; }
+
+    private:
+        int globalBlockId = 0;
         FSDiskMemoryDataNode *fsDiskMemoryDataHeadNode = nullptr;
     };
 }

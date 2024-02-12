@@ -28,7 +28,7 @@ namespace fs {
         bool closeFile();
         bool deleteFile();
         bool deleteDirectory();
-        bool getPrograms();
+        bool getProgram();
         bool installProgram();
 
 
@@ -40,6 +40,5 @@ namespace fs {
         };
 
         FSHandlers fsHandlers{};
-        FSFileTree *fsFileTree;
     };
 }

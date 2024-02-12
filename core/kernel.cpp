@@ -2,6 +2,7 @@
 
 namespace fs {
     FSKernel::FSKernel() {
+        fsHandlers.fsDiskHandler = new FSDiskHandler();
     }
 
     FSKernel::~FSKernel() {
@@ -13,6 +14,6 @@ namespace fs {
         {
             throw FSException("KERNEL_FILE_SYSTEM_ERROR");
         }
-        std::cout << "All systems check." << std::endl;
+        std::cout << fsHandlers.fsDiskHandler->getDiskSize() << " vBytes." << std::endl;
     }
 }
