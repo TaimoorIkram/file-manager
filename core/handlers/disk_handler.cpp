@@ -42,14 +42,18 @@ namespace fs {
         std::ofstream diskFile;
         diskFile.open(diskFilePath);
         if(diskFile.is_open()){
-            diskFile << "0 012345678 1 true \n";
+            FSDisk::FSDiskMemoryDataNode *diskMemoryNode = fsDisk->getHeadNode();
+            while (diskMemoryNode != nullptr) {
+                diskFile << diskMemoryNode->id << "]+{=}+[" << diskMemoryNode->data  << "]+{=}+[" << diskMemoryNode->toRead << "\n";
+                diskMemoryNode = diskMemoryNode->next;
+            }
             diskFile.close();
             return true;
         }
         else return false;
     }
 
-    bool FSDiskHandler::writeToDisk(std::string) {
+    bool FSDiskHandler::writeToDisk(std::string data) {
         // TODO: 
         // 1. Divide the string into byte length parts and store in a buffer. 
         // 2. Write them one by one from buffer to memory by first requesting 
@@ -59,9 +63,24 @@ namespace fs {
         // 4. Start writing the bytes one by one to the disk by requesting the 
         // next available non-empty block.
         //
+        int blockDataSize = data.size();
+        int blocksNeeded = ceil((double) blockDataSize / FS_DISK_BLOCK_SIZE);
+        if (fsDisk->getFreeNodeCount() < blocksNeeded) return false;
+        FSDisk::FSDiskMemoryDataNode *prevNode = nullptr, *currentNode = nullptr;
+
+        for (int index = 0; index < blocksNeeded; index++) {
+            int blockDataStartIndex = index * FS_DISK_BLOCK_SIZE;
+            std::string blockData = data.substr(blockDataStartIndex, FS_DISK_BLOCK_SIZE);
+            prevNode = currentNode;
+            currentNode = fsDisk->writeToBlock(fsDisk->getNextEmptyDataNode(), blockData, true);
+            
+            if (prevNode != nullptr) fsDisk->linkNodes(prevNode->id, currentNode->id);
+        }
+
+        return true;
     }
     
-    bool FSDiskHandler::writeToDisk(int blockId, std::string) {
+    bool FSDiskHandler::writeToDisk(int blockId, std::string blockData) {
         // TODO: 
         // 1. Divide the string into byte length parts and store in a buffer. 
         // 2. Write them one by one from buffer to memory by first requesting 
@@ -71,9 +90,15 @@ namespace fs {
         // 4. Start writing the data one byte by the other by first writing to 
         // the byte blockId of the virtual disk (fsDisk) object.
         //
+
+        return false;
     }
 
     int FSDiskHandler::getDiskSize() {
         return fsDisk->getNodeCount();
+    }
+    
+    int FSDiskHandler::getDiskSizeRemaining() {
+        return fsDisk->getFreeNodeCount();
     }
 }

@@ -32,19 +32,21 @@ namespace fs
         ~FSDisk();
         
 
-        std::string writeToBlock(int id, std::string data);
+        FSDiskMemoryDataNode* writeToBlock(int id, std::string data, bool markRead = false);
         std::string readFromBlock(int id);
         FSDiskMemoryDataNode* addDiskMemoryDataNode(std::string data);
         bool linkNodes(int fromId, int toId);
         FSDiskMemoryDataNode* getHeadNode();
         FSDiskMemoryDataNode* getNode(int id);
+        int getFreeNodeCount();
         int getNodeCount();
         FSDiskMemoryDataNode* getLinkedNodes(int id);
-        FSDiskMemoryDataNode* getNextEmptyDataNode();
+        int getNextEmptyDataNode();
         bool isFull() { return globalBlockId < FS_DISK_MAX_BLOCK_COUNT; }
 
     private:
         int globalBlockId = 0;
+        int freeNodeCount = FS_DISK_MAX_BLOCK_COUNT;
         FSDiskMemoryDataNode *fsDiskMemoryDataHeadNode = nullptr;
     };
 }

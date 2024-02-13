@@ -22,11 +22,15 @@ namespace fs {
         }
     }
 
-    std::string FSDisk::writeToBlock(int id, std::string data) {
+    FSDisk::FSDiskMemoryDataNode* FSDisk::writeToBlock(int id, std::string data, bool markRead) {
         FSDisk::FSDiskMemoryDataNode* tempNode = getNode(id);
         std::string oldDiskData = tempNode->data;
         tempNode->data = data;
-        return oldDiskData;
+        if (markRead == true) {
+            tempNode->empty = false;
+            freeNodeCount--;
+        }
+        return tempNode;
     }
 
     std::string FSDisk::readFromBlock(int id) {
@@ -37,20 +41,21 @@ namespace fs {
 
     FSDisk::FSDiskMemoryDataNode* FSDisk::addDiskMemoryDataNode(std::string data) {
         FSDisk::FSDiskMemoryDataNode* tempNode = getHeadNode();
-        FSDisk::FSDiskMemoryDataNode newNode{};
-        newNode.id = globalBlockId++;
-        newNode.data = data;
-        newNode.next = nullptr;
-        newNode.sizeRemaining = FS_DISK_BLOCK_SIZE;
-        newNode.toRead = -1;
+        FSDisk::FSDiskMemoryDataNode *newNode = new FSDisk::FSDiskMemoryDataNode;
+        newNode->id = globalBlockId++;
+        newNode->data = data;
+        newNode->next = nullptr;
+        newNode->sizeRemaining = FS_DISK_BLOCK_SIZE;
+        newNode->toRead = -1;
 
-        if (tempNode == nullptr) {
-            tempNode = &newNode;
+        if (fsDiskMemoryDataHeadNode == nullptr) {
+            fsDiskMemoryDataHeadNode = newNode;
+            return tempNode;
         }
         while (tempNode->next != nullptr) {
             tempNode = tempNode->next;
         }
-        tempNode->next = &newNode;
+        tempNode->next = newNode;
         return tempNode->next;
     }
     
@@ -72,15 +77,20 @@ namespace fs {
         return tempRootNode;
     }
 
-    FSDisk::FSDiskMemoryDataNode* FSDisk::getNextEmptyDataNode() {
+    int FSDisk::getNextEmptyDataNode() {
         FSDisk::FSDiskMemoryDataNode *tempNode = getHeadNode();
-        while (tempNode->next != nullptr) {
-            if (tempNode->empty) return tempNode;
+        while (tempNode != nullptr) {
+            if (tempNode->empty) return tempNode->id;
+            tempNode = tempNode->next;
         }
-        return NULL;
+        return -1;
     }
 
     int FSDisk::getNodeCount() {
         return globalBlockId;
+    }
+    
+    int FSDisk::getFreeNodeCount() {
+        return freeNodeCount;
     }
 }

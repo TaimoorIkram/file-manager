@@ -14,10 +14,11 @@ namespace fs {
         bool loadDisk(std::string diskFilePath);
         bool saveDisk(std::string diskFilePath);
         bool resetDisk(std::string diskFilePath);
-        bool writeToDisk(std::string);
-        bool writeToDisk(int blockId, std::string);
+        bool writeToDisk(std::string data);
+        bool writeToDisk(int blockId, std::string data);
         std::string readFromDisk(int blockId, bool linkedNodes = false);
         int getDiskSize();
+        int getDiskSizeRemaining();
 
         private:
         FSDisk *fsDisk;
