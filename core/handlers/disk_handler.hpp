@@ -1,5 +1,8 @@
 #include "../hardwares/disk.hpp"
 
+#define FS_DISK_DELIMITER "]+{=}+["
+#define FS_DISK_NO_DATA "........"
+
 namespace fs {
     /**
      * @brief System handler for the disk virtual objects. Performs

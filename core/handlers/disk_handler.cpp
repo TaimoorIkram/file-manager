@@ -1,6 +1,7 @@
 #include "disk_handler.hpp"
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace fs {
     FSDiskHandler::FSDiskHandler() {
@@ -9,19 +10,24 @@ namespace fs {
     }
 
     bool FSDiskHandler::resetDisk(std::string diskFilePath) {
-        std::ofstream diskFile;
-        diskFile.open(diskFilePath);
-        if(diskFile.is_open()){
-            for (int id = 0; id < FS_DISK_MAX_BLOCK_COUNT; id++)
-            {
-                diskFile << id << " ........ -1 false \n";
-                fsDisk->addDiskMemoryDataNode("........");
-            }
-            
-            diskFile.close();
-            return true;
+        for (int id = 0; id < FS_DISK_MAX_BLOCK_COUNT; id++)
+        {
+            fsDisk->addDiskMemoryDataNode(FS_DISK_NO_DATA);
         }
-        else return false;
+        return true;
+    }
+
+    std::vector<std::string> splitString(std::string& str, std::string delimiter) {
+        std::vector<std::string> tokens;
+        size_t pos = 0;
+        size_t delimiterLength = delimiter.length();
+
+        while ((pos = str.find(delimiter)) != std::string::npos) {
+            tokens.push_back(str.substr(0, pos));
+            str.erase(0, pos + delimiterLength);
+        }
+        tokens.push_back(str); // Push the remaining part of the string after the last delimiter
+        return tokens;
     }
 
     bool FSDiskHandler::loadDisk(std::string diskFilePath) {
@@ -30,7 +36,16 @@ namespace fs {
         diskFile.open(diskFilePath);
         if (diskFile.is_open()) {
             while (std::getline(diskFile, diskLine)) {
-                std::cout << diskLine << std::endl;
+                std::vector<std::string> diskLineTokens = splitString(diskLine, FS_DISK_DELIMITER);
+
+                int blockId = std::stoi(diskLineTokens.at(0));
+                std::string blockData = diskLineTokens.at(1);
+                int blockLinkedToId = std::stoi(diskLineTokens.at(0));
+                
+                if (blockData == FS_DISK_NO_DATA) continue;
+                
+                fsDisk->writeToBlock(blockId, blockData, true);
+                fsDisk->linkNodes(blockId, blockLinkedToId);
             }
             diskFile.close();
             return true;
@@ -44,7 +59,7 @@ namespace fs {
         if(diskFile.is_open()){
             FSDisk::FSDiskMemoryDataNode *diskMemoryNode = fsDisk->getHeadNode();
             while (diskMemoryNode != nullptr) {
-                diskFile << diskMemoryNode->id << "]+{=}+[" << diskMemoryNode->data  << "]+{=}+[" << diskMemoryNode->toRead << "\n";
+                diskFile << diskMemoryNode->id << FS_DISK_DELIMITER << diskMemoryNode->data  << FS_DISK_DELIMITER << diskMemoryNode->toRead << "\n";
                 diskMemoryNode = diskMemoryNode->next;
             }
             diskFile.close();

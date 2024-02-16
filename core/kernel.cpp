@@ -1,5 +1,7 @@
 #include "kernel.hpp"
 
+#define FS_KERNEL_DISK_FILE_PATH "D:\\NUST Semester 6\\Extras\\Side Projects\\file-manager\\core\\memory\\disk.txt"
+
 namespace fs {
     FSKernel::FSKernel() {
         fsHandlers.fsDiskHandler = new FSDiskHandler();
@@ -24,17 +26,37 @@ namespace fs {
         // 5. Kernel will load the system environment variables
         // when the external programs feature is implemented.
         //
-        std::cout << "RESETTING MEMORY ";
-        if (!fsHandlers.fsDiskHandler->resetDisk("D:\\NUST Semester 6\\Extras\\Side Projects\\file-manager\\core\\memory\\disk.txt"))
+        std::cout << "Preparing Disk ... ";
+        if (!fsHandlers.fsDiskHandler->resetDisk(FS_KERNEL_DISK_FILE_PATH))
         {
             throw FSException("KERNEL_FILE_SYSTEM_ERROR");
         }
-        fsHandlers.fsDiskHandler->writeToDisk("It is a beautiful sunny day at Lorkenhorme, Germland. We hope you have a great day today!");
-        std::cout << fsHandlers.fsDiskHandler->getDiskSizeRemaining() << " vBytes." << std::endl;
-        if (!fsHandlers.fsDiskHandler->saveDisk("D:\\NUST Semester 6\\Extras\\Side Projects\\file-manager\\core\\memory\\disk.txt"))
+        std::cout << "Done" << std::endl;
+
+        std::cout << "Saving Initial Disk State ... ";
+        if (!fsHandlers.fsDiskHandler->saveDisk(FS_KERNEL_DISK_FILE_PATH))
         {
             throw FSException("KERNEL_FILE_SYSTEM_ERROR");
         }
+        std::cout << "Done" << std::endl;
+
+        std::cout << "Loading Saved Disk State ... ";
+        if (!fsHandlers.fsDiskHandler->loadDisk(FS_KERNEL_DISK_FILE_PATH))
+        {
+            throw FSException("KERNEL_FILE_SYSTEM_ERROR");
+        }
+        std::cout << "Done" << std::endl;
+
+        fsHandlers.fsDiskHandler->writeToDisk("Christiano Ronaldo and Lionel Messi are the best players in the world!");
+        std::cout << fsHandlers.fsDiskHandler->getDiskSizeRemaining() << " vBytes free." << std::endl;
+
+        std::cout << "Saving Modified Disk State ... ";
+        if (!fsHandlers.fsDiskHandler->saveDisk(FS_KERNEL_DISK_FILE_PATH))
+        {
+            throw FSException("KERNEL_FILE_SYSTEM_ERROR");
+        }
+        std::cout << "Done" << std::endl;
+
         return true;
     }
 }
