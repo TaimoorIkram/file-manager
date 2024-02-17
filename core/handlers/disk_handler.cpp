@@ -106,7 +106,41 @@ namespace fs {
         // the byte blockId of the virtual disk (fsDisk) object.
         //
 
-        return false;
+        // Check if the blockId is valid
+        if (blockId < 0 || blockId >= fsDisk->getNodeCount()) {
+            // Invalid blockId
+            return false;
+        }
+        // checking blocks needed
+        int blockDataSize = blockData.size();
+        int blocksNeeded = ceil((double)blockDataSize / FS_DISK_BLOCK_SIZE);
+        if (fsDisk->getFreeNodeCount() < blocksNeeded) return false; // need to raise the DISK_MEMORY_OVERFLOW_EXCEPTION
+        // storing into a  buffer
+        int startPos = 0;
+        std::vector<std::string> blocks;
+        while (startPos < blockData.length()) {
+            blocks.push_back(blockData.substr(startPos, FS_DISK_BLOCK_SIZE));
+            startPos += FS_DISK_BLOCK_SIZE;
+        }
+
+        // wrting 
+        FSDisk::FSDiskMemoryDataNode* prevNode = nullptr, * currentNode = nullptr;
+
+        for (int index = 0; index < blocks.size(); index++) {
+            prevNode = currentNode;
+            currentNode = fsDisk->writeToBlock(blockId, blocks[index], true);
+            if (fsDisk->getNode(blockId)->toRead != -1)
+            {
+                blockId = fsDisk->getNode(blockId)->toRead;
+            }
+            else {
+                blockId = fsDisk->getNextEmptyDataNode();
+            }
+            if (prevNode != nullptr) fsDisk->linkNodes(prevNode->id, currentNode->id);
+
+        }
+
+        return true;
     }
 
     int FSDiskHandler::getDiskSize() {

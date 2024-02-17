@@ -1,6 +1,6 @@
 #include "kernel.hpp"
 
-#define FS_KERNEL_DISK_FILE_PATH "D:\\NUST Semester 6\\Extras\\Side Projects\\file-manager\\core\\memory\\disk.txt"
+#define FS_KERNEL_DISK_FILE_PATH "C:\\Users\\HP\\Desktop\\File System\\file-manager\\core\\memory\\disk.txt"
 
 namespace fs {
     FSKernel::FSKernel() {
@@ -47,7 +47,7 @@ namespace fs {
         }
         std::cout << "Done" << std::endl;
 
-        fsHandlers.fsDiskHandler->writeToDisk("Christiano Ronaldo and Lionel Messi are the best players in the world!");
+        fsHandlers.fsDiskHandler->writeToDisk(5, "Christiano Ronaldo and Lionel Messi are the best players in the world!");
         std::cout << fsHandlers.fsDiskHandler->getDiskSizeRemaining() << " vBytes free." << std::endl;
 
         std::cout << "Saving Modified Disk State ... ";
