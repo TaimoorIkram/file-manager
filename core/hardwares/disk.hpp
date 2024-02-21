@@ -43,6 +43,7 @@ namespace fs
         FSDiskMemoryDataNode* getLinkedNodes(int id);
         int getNextEmptyDataNode();
         bool isFull() { return globalBlockId < FS_DISK_MAX_BLOCK_COUNT; }
+        bool freeBlock(int blockId);
 
     private:
         int globalBlockId = 0;

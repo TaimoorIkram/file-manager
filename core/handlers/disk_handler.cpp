@@ -1,4 +1,5 @@
 #include "disk_handler.hpp"
+#include "../utils/utils.hpp"
 #include <fstream>
 #include <string>
 #include <vector>
@@ -17,26 +18,13 @@ namespace fs {
         return true;
     }
 
-    std::vector<std::string> splitString(std::string& str, std::string delimiter) {
-        std::vector<std::string> tokens;
-        size_t pos = 0;
-        size_t delimiterLength = delimiter.length();
-
-        while ((pos = str.find(delimiter)) != std::string::npos) {
-            tokens.push_back(str.substr(0, pos));
-            str.erase(0, pos + delimiterLength);
-        }
-        tokens.push_back(str); // Push the remaining part of the string after the last delimiter
-        return tokens;
-    }
-
     bool FSDiskHandler::loadDisk(std::string diskFilePath) {
         std::ifstream diskFile;
         std::string diskLine;
         diskFile.open(diskFilePath);
         if (diskFile.is_open()) {
             while (std::getline(diskFile, diskLine)) {
-                std::vector<std::string> diskLineTokens = splitString(diskLine, FS_DISK_DELIMITER);
+                std::vector<std::string> diskLineTokens = FSUtils::splitString(diskLine, FS_DISK_DELIMITER);
 
                 int blockId = std::stoi(diskLineTokens.at(0));
                 std::string blockData = diskLineTokens.at(1);
@@ -138,6 +126,23 @@ namespace fs {
             }
             if (prevNode != nullptr) fsDisk->linkNodes(prevNode->id, currentNode->id);
 
+        }
+
+        return true;
+    }
+
+    bool FSDiskHandler::clearDisk(int blockId, bool clearLinked = false) {
+        FSDisk::FSDiskMemoryDataNode* tempNode = fsDisk->getNode(blockId);
+
+        if (clearLinked == true) {
+            int nextNodeId = -1;
+            while (true) {
+                nextNodeId = tempNode->toRead;
+                fsDisk->freeBlock(tempNode->id);
+
+                if (nextNodeId == -1) break;
+                tempNode = fsDisk->getNode(nextNodeId);
+            }
         }
 
         return true;

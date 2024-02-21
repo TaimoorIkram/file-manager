@@ -20,6 +20,8 @@ namespace fs {
             if (tempNode->id == id) return tempNode;
             tempNode = tempNode->next;
         }
+
+        return nullptr;
     }
 
     FSDisk::FSDiskMemoryDataNode* FSDisk::writeToBlock(int id, std::string data, bool markRead) {
@@ -84,6 +86,16 @@ namespace fs {
             tempNode = tempNode->next;
         }
         return -1;
+    }
+
+    bool FSDisk::freeBlock(int blockId) {
+        FSDisk::FSDiskMemoryDataNode* tempNode = getNode(blockId);
+        tempNode->data = "........";
+        tempNode->sizeRemaining = FS_DISK_BLOCK_SIZE;
+        tempNode->toRead = -1;
+        freeNodeCount++;
+
+        return true;
     }
 
     int FSDisk::getNodeCount() {

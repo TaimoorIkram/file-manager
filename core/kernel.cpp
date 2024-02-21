@@ -1,10 +1,11 @@
 #include "kernel.hpp"
 
-#define FS_KERNEL_DISK_FILE_PATH "C:\\Users\\HP\\Desktop\\File System\\file-manager\\core\\memory\\disk.txt"
+#define FS_KERNEL_DISK_FILE_PATH "D:\\NUST Semester 6\\Extras\\Side Projects\\file-manager\\core\\memory\\disk.txt"
 
 namespace fs {
     FSKernel::FSKernel() {
         fsHandlers.fsDiskHandler = new FSDiskHandler();
+        fsHandlers.fsFileTree = new FSFileTree();
     }
 
     FSKernel::~FSKernel() {
@@ -29,14 +30,14 @@ namespace fs {
         std::cout << "Preparing Disk ... ";
         if (!fsHandlers.fsDiskHandler->resetDisk(FS_KERNEL_DISK_FILE_PATH))
         {
-            throw FSException("KERNEL_FILE_SYSTEM_ERROR");
+            throw FSException("KERNEL_DISK_ERROR");
         }
         std::cout << "Done" << std::endl;
 
         std::cout << "Saving Initial Disk State ... ";
         if (!fsHandlers.fsDiskHandler->saveDisk(FS_KERNEL_DISK_FILE_PATH))
         {
-            throw FSException("KERNEL_FILE_SYSTEM_ERROR");
+            throw FSException("KERNEL_DISK_ERROR");
         }
         std::cout << "Done" << std::endl;
 
@@ -50,6 +51,37 @@ namespace fs {
         fsHandlers.fsDiskHandler->writeToDisk(5, "Christiano Ronaldo and Lionel Messi are the best players in the world!");
         std::cout << fsHandlers.fsDiskHandler->getDiskSizeRemaining() << " vBytes free." << std::endl;
 
+        fsHandlers.fsFileTree->createDirectory("hello");
+        fsHandlers.fsFileTree->createDirectory("./hamas");
+        fsHandlers.fsFileTree->createDirectory("./skibidi/toilet");
+        fsHandlers.fsFileTree->createDirectory("hello/play");
+        fsHandlers.fsFileTree->createDirectory("hello/work");
+        fsHandlers.fsFileTree->createFile("hello/new.txt");
+        FSFile *file = fsHandlers.fsFileTree->createFile("hello/work/sheet.xlsx");
+        file->setFileStartBlock(5);
+
+
+        FSDirectory* directoryPointer = fsHandlers.fsFileTree->findDirectory("hello/work");
+        if (directoryPointer == nullptr) {
+            throw FSException("REQUESTED_UNKNOWN_DIRECTORY");
+        }
+        
+        std::vector<FSFile*> directoryFilesPointers = directoryPointer->getFiles();
+        std::cout << directoryFilesPointers.size() << std::endl;
+        for each (FSFile * filePointer in directoryFilesPointers) {
+            if (!fsHandlers.fsDiskHandler->clearDisk(filePointer->getFileStartBlock(), true)) {
+                throw FSException("FILE_DELETE_EXCEPTION");
+            }
+        }
+
+        if (!fsHandlers.fsFileTree->deleteFile("hello/work/sheet.xlsx")) {
+            throw FSException("UNCHANGED_FILE_TREE");
+        }
+
+        std::cout << fsHandlers.fsFileTree->getDirectoryTree(fsHandlers.fsFileTree->getCurrentDirectory()) << std::endl;
+
+        std::cout << fsHandlers.fsDiskHandler->getDiskSizeRemaining() << " vBytes free." << std::endl;
+        
         std::cout << "Saving Modified Disk State ... ";
         if (!fsHandlers.fsDiskHandler->saveDisk(FS_KERNEL_DISK_FILE_PATH))
         {

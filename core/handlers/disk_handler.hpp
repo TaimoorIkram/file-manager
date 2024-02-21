@@ -19,6 +19,7 @@ namespace fs {
         bool resetDisk(std::string diskFilePath);
         bool writeToDisk(std::string data);
         bool writeToDisk(int blockId, std::string data);
+        bool clearDisk(int blockId, bool clearLinked);
         std::string readFromDisk(int blockId, bool linkedNodes = false);
         int getDiskSize();
         int getDiskSizeRemaining();

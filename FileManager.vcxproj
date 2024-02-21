@@ -98,13 +98,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="core\cli\command_line.cpp" />
+    <ClCompile Include="core\components\file_system\directory.cpp" />
+    <ClCompile Include="core\components\file_system\file.cpp" />
+    <ClCompile Include="core\components\file_system\file_tree.cpp" />
     <ClCompile Include="core\exception.cpp" />
     <ClCompile Include="core\handlers\disk_handler.cpp" />
     <ClCompile Include="core\hardwares\disk.cpp" />
     <ClCompile Include="core\kernel.cpp" />
     <ClCompile Include="core\main.cpp" />
+    <ClCompile Include="core\utils\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="core\cli\command_line.hpp" />
     <ClInclude Include="core\components\file_system\directory.hpp" />
     <ClInclude Include="core\components\file_system\file.hpp" />
     <ClInclude Include="core\components\file_system\file_tree.hpp" />
@@ -114,6 +120,7 @@
     <ClInclude Include="core\hardwares\disk.hpp" />
     <ClInclude Include="core\hardwares\memory.hpp" />
     <ClInclude Include="core\kernel.hpp" />
+    <ClInclude Include="core\utils\utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

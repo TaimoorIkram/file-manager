@@ -5,8 +5,8 @@ int main(int argc, const char** argv) {
     try {
         krnl.startKernel();
     }
-    catch (std::exception e) {
-        e.what();
+    catch (fs::FSException e) {
+        std::cout << e.what() << std::endl;
     }
     std::getchar();
 }
